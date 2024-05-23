@@ -19,35 +19,34 @@ export default function CadastroPaciente() {
     control,
     formState: { errors },
   } = useForm();
-  const onSubmit = () => {
-    sessionStorage.setItem("name", document.querySelector("#nome").value);
-    armazenaName(document.querySelector("#nome").value);
-    armazenaWhatsapp(document.querySelector("#whatsapp").value);
-    armazenaEmail(document.querySelector("#email").value);
-    armazenaHasAvc(document.querySelector("#historicoAVCFamilia").value);
-    armazenaHasAnotherCondition(document.querySelector("#outraCondicao").value);
-    armazenaInvestmentAmount(document.querySelector("#valorInvestir").value);
+
+  const onSubmit = (data) => {
+    // Armazenar dados no estado
+    armazenaName(data.nome);
+    armazenaEmail(data.email);
+    armazenaWhatsapp(data.whatsapp);
+    armazenaHasAvc(data.historicoAVCFamilia);
+    armazenaHasAnotherCondition(data.outraCondicaoSaude);
+    armazenaInvestmentAmount(data.valorInvestir);
+
+    // Navegar para a próxima tela
     trocarTela();
   };
 
   return (
-    <div className=" bg-telaInicial min-h-screen bg-no-repeat bg-cover bg-center bg-fixed sm:max-w-full  md:max-w-5xl lg:max-w-6xl xl:max-w-full ">
-      <div className=" flex justify-center items-center h-screen font-poppins">
+    <div className="bg-telaInicial min-h-screen bg-no-repeat bg-cover bg-center bg-fixed sm:max-w-full md:max-w-5xl lg:max-w-6xl xl:max-w-full">
+      <div className="flex justify-center items-center h-screen font-poppins">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-cardPac h-cardPac p-12 bg-white flex flex-col gap-8 rounded-md sm:w-smFundoCard xm:w-xmFundoCard xm:h-xmHeightPaciente"
         >
           <label className="text-2xl font-bold">Informações do paciente</label>
-          <div className=" flex gap-6 xm:flex-col">
+          <div className="flex gap-6 xm:flex-col">
             <input
               id="nome"
               placeholder="Nome*"
               {...register("nome", {
                 required: "Nome obrigatório",
-                pattern: {
-                  value: "",
-                  message: "Nome inválido",
-                },
               })}
               className={`outline-azulEscuro placeholder-gray-500 p-4 xm:w-full border h-14 rounded border-gray-400 mr-0.5 ${
                 errors.nome ? "placeholder:text-red-500" : ""
@@ -59,10 +58,6 @@ export default function CadastroPaciente() {
               placeholder="whatsapp*"
               {...register("whatsapp", {
                 required: "Número obrigatório",
-                pattern: {
-                  value: "",
-                  message: "Número inválido",
-                },
               })}
               className={`outline-azulEscuro placeholder-gray-500 p-4 xm:w-full border h-14 rounded border-gray-400 mr-0.5 text-sm ${
                 errors.whatsapp ? "placeholder:text-red-500" : ""
@@ -79,35 +74,22 @@ export default function CadastroPaciente() {
             type="email"
             {...register("email", {
               required: "Email obrigatório",
-              pattern: {
-                value: "",
-                message: "Email inválido",
-              },
             })}
           />
           <label className="text-2xl font-bold">Informações do AVC</label>
-          <div className=" flex gap-6 xm:flex-col">
+          <div className="flex gap-6 xm:flex-col">
             <Controller
               name="historicoAVCFamilia"
-              defaultValue=""
               control={control}
+              defaultValue=""
               rules={{ required: "Por favor, selecione uma opção" }}
               render={({ field }) => (
                 <select
                   {...field}
                   id="historicoAVCFamilia"
-                  className="outline-none border border-1"
-                  onClick={() => {
-                    if (
-                      document
-                        .querySelector("#historicoAVCFamilia")
-                        .classList.contains("text-red-500")
-                    ) {
-                      document
-                        .querySelector("#historicoAVCFamilia")
-                        .classList.remove("text-red-500");
-                    }
-                  }}
+                  className={`outline-none border border-1 ${
+                    errors.historicoAVCFamilia ? "text-red-500" : ""
+                  }`}
                 >
                   <option value="" disabled hidden>
                     Você tem AVC na familia?
@@ -117,46 +99,39 @@ export default function CadastroPaciente() {
                 </select>
               )}
             />
-            {errors.historicoAVCFamilia &&
-              document
-                .querySelector("#historicoAVCFamilia")
-                .classList.add("text-red-500")}
+            {errors.historicoAVCFamilia && (
+              <span className="text-red-500">
+                {errors.historicoAVCFamilia.message}
+              </span>
+            )}
             <Controller
               name="valorInvestir"
-              defaultValue=""
               control={control}
+              defaultValue=""
               rules={{ required: "Por favor, selecione um valor a investir" }}
               render={({ field }) => (
                 <select
                   {...field}
                   id="valorInvestir"
-                  className="outline-none border border-1"
-                  onClick={() => {
-                    if (
-                      document
-                        .querySelector("#valorInvestir")
-                        .classList.contains("text-red-500")
-                    ) {
-                      document
-                        .querySelector("#valorInvestir")
-                        .classList.remove("text-red-500");
-                    }
-                  }}
+                  className={`outline-none border border-1 ${
+                    errors.valorInvestir ? "text-red-500" : ""
+                  }`}
                 >
                   <option value="" disabled hidden>
                     Não tenho valor para investir
                   </option>
-                  <option>R$ 500 a R$1000</option>
-                  <option>R$ 1000 a R$1500</option>
-                  <option>R$ 1600 a R$2500</option>
-                  <option>Acima de R$2500</option>
+                  <option value="R$ 500 a R$1000">R$ 500 a R$1000</option>
+                  <option value="R$ 1000 a R$1500">R$ 1000 a R$1500</option>
+                  <option value="R$ 1600 a R$2500">R$ 1600 a R$2500</option>
+                  <option value="Acima de R$2500">Acima de R$2500</option>
                 </select>
               )}
             />
-            {errors.valorInvestir &&
-              document
-                .querySelector("#valorInvestir")
-                .classList.add("text-red-500")}
+            {errors.valorInvestir && (
+              <span className="text-red-500">
+                {errors.valorInvestir.message}
+              </span>
+            )}
           </div>
           <input
             id="outraCondicao"
@@ -167,16 +142,12 @@ export default function CadastroPaciente() {
             type="text"
             {...register("outraCondicaoSaude", {
               required: "Campo obrigatório",
-              pattern: {
-                value: "",
-                message: "Número inválido",
-              },
             })}
           />
           <div className="flex justify-center">
             <button
               type="submit"
-              className=" w-32 h-10 delay-300 bg-corAzul hover:bg-azulEscuro ease-linear duration-300 font-bold text-white rounded "
+              className="w-32 h-10 delay-300 bg-corAzul hover:bg-azulEscuro ease-linear duration-300 font-bold text-white rounded"
             >
               Avançar
             </button>

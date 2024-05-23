@@ -5,27 +5,18 @@ import { useStore } from "../scripts/controlador-estados";
 export default function CadastroLocalizacao() {
   const navigate = useNavigate();
   const trocarTela = () => navigate("/localizacaoProfissionais");
-  const {
-    armazenaCity,
-    armazenaState,
-    fetchLatLong
-  } = useStore();
+  const { armazenaCity, armazenaState, fetchLatLong, postData } = useStore();
 
   const {
     register,
-    handleSubmit,
     setValue,
     setFocus,
     formState: { errors },
   } = useForm();
 
   const onSubmit = () => {
-    armazenaCity(document.querySelector('#cidade').value);
-    armazenaState(document.querySelector('#estado').value);
-    fetchLatLong(document.querySelector('#cep').value);
-    setTimeout(()=>{
-      trocarTela();
-    }, 1500)
+    fetchLatLong(document.querySelector("#cep").value);
+    postData();
   };
 
   const checkCEP = (e) => {
@@ -45,17 +36,15 @@ export default function CadastroLocalizacao() {
   return (
     <div className=" bg-telaInicial min-h-screen bg-no-repeat bg-cover bg-center bg-fixed sm:max-w-full  md:max-w-5xl lg:max-w-6xl xl:max-w-full ">
       <div className=" flex justify-center items-center h-screen font-poppins">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className=" w-fundoCard h-fundoCard p-12 bg-white flex flex-col gap-8 rounded-md sm:w-smFundoCard sm:h-smFundoCard xm:w-xmFundoCard xm:h-xmHeightLocalizacao"
-        >
+        <form className=" w-fundoCard h-fundoCard p-12 bg-white flex flex-col gap-8 rounded-md sm:w-smFundoCard sm:h-smFundoCard xm:w-xmFundoCard xm:h-xmHeightLocalizacao">
           <label className="text-2xl font-bold mt-6">Localização </label>
           <div className="flex flex-col gap-6">
             <input
               id="cep"
               placeholder="CEP*"
-              className={`outline-azulEscuro placeholder-gray-500 border p-6  h-14 rounded border-gray-400 ${errors.cep ? "placeholder:text-red-500" : ""
-                }`}
+              className={`outline-azulEscuro placeholder-gray-500 border p-6  h-14 rounded border-gray-400 ${
+                errors.cep ? "placeholder:text-red-500" : ""
+              }`}
               type="text"
               {...register("cep", {
                 required: "CEP obrigatório",
@@ -69,19 +58,26 @@ export default function CadastroLocalizacao() {
             <input
               id="cidade"
               placeholder="Cidade"
-              className={`outline-azulEscuro placeholder-gray-500 p-6 border h-14 rounded border-gray-400 ${errors.cidade ? "placeholder:text-red-500" : ""}`} 
+              onChange={(e) => {
+                armazenaCity(e.target.value);
+              }}
+              className={`outline-azulEscuro placeholder-gray-500 p-6 border h-14 rounded border-gray-400 ${
+                errors.cidade ? "placeholder:text-red-500" : ""
+              }`}
               type="text"
               {...register("cidade", {
-                required: "Cidade obrigatória"
+                required: "Cidade obrigatória",
               })}
             />
 
             <input
               placeholder="Rua"
-              className={`outline-azulEscuro placeholder-gray-500 p-6 border h-14 rounded border-gray-400 ${errors.rua ? "placeholder:text-red-500" : ""}`}
+              className={`outline-azulEscuro placeholder-gray-500 p-6 border h-14 rounded border-gray-400 ${
+                errors.rua ? "placeholder:text-red-500" : ""
+              }`}
               type="text"
               {...register("rua", {
-                required: "Rua obrigatória"
+                required: "Rua obrigatória",
               })}
             />
           </div>
@@ -107,10 +103,15 @@ export default function CadastroLocalizacao() {
             <input
               id="estado"
               placeholder="Estado"
-              className={`outline-azulEscuro placeholder-gray-500 p-6 w-52 border xm:w-full h-14 rounded border-gray-400 ${errors.estado ? "placeholder:text-red-500" : ""}`}
+              onChange={(e) => {
+                armazenaState(e.target.value);
+              }}
+              className={`outline-azulEscuro placeholder-gray-500 p-6 w-52 border xm:w-full h-14 rounded border-gray-400 ${
+                errors.estado ? "placeholder:text-red-500" : ""
+              }`}
               type="text"
               {...register("estado", {
-                required: "Estado obrigatório"
+                required: "Estado obrigatório",
               })}
             />
           </div>
@@ -118,6 +119,9 @@ export default function CadastroLocalizacao() {
             <button
               type="submit"
               className=" w-32 h-10  bg-corAzul hover:bg-azulEscuro ease-linear duration-300 font-bold text-white rounded "
+              onClick={() => {
+                onSubmit();
+              }}
             >
               Avançar
             </button>

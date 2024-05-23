@@ -1,65 +1,87 @@
-import { create } from 'zustand'
+import { create } from "zustand";
+import axios from "axios"; // Certifique-se de importar axios
 import { getDistance } from "../scripts/distancia";
-const apiKey = '1e469ea4b5d9425c9bbe2b158852c80d';
+import { createContext, useContext } from "react";
 
+const apiKey = "1e469ea4b5d9425c9bbe2b158852c80d";
 
-export const useStore = create((set) => ({
+export const useStore = create((set, get) => ({
+  name: "",
+  email: "",
+  whatsapp: "",
+  state: "",
+  city: "",
+  hasAvc: "",
+  hasAnotherCondition: "",
+  investmentAmount: "",
 
-    name: "",
-    email: "",
-    whatsapp: "",
-    state: "",
-    city: "",
-    hasAvc: "",
-    hasAnotherCondition: "",
-    investmentAmount: "",
+  armazenaInvestmentAmount: (payload) => set({ investmentAmount: payload }),
+  armazenaHasAnotherCondition: (payload) =>
+    set({ hasAnotherCondition: payload }),
+  armazenaHasAvc: (payload) => set({ hasAvc: payload }),
+  armazenaCity: (payload) => set({ city: payload }),
+  armazenaState: (payload) => set({ state: payload }),
+  armazenaWhatsapp: (payload) => set({ whatsapp: payload }),
+  armazenaEmail: (payload) => set({ email: payload }),
+  armazenaName: (payload) => set({ name: payload }),
 
-    armazenaInvestmentAmount: (payload) => set({ investmentAmount: payload }),
-    armazenaHasAnotherCondition: (payload) => set({ hasAnotherCondition: payload }),
-    armazenaHasAvc: (payload) => set({ hasAvc: payload }),
-    armazenaCity: (payload) => set({ city: payload }),
-    armazenaState: (payload) => set({ state: payload }),
-    armazenaWhatsapp: (payload) => set({ whatsapp: payload }),
-    armazenaEmail: (payload) => set({ email: payload }),
-    armazenaName: (payload) => set({ name: payload }),
+  data: [],
 
-    data: [],
+  origem: [-8.062, -34.8725],
+  destino: [],
 
-    origem: [
-        -8.0620, 
-        -34.8725
-    ],
-    destino: [],
+  postData: async () => {
+    const {
+      name,
+      email,
+      whatsapp,
+      state,
+      city,
+      hasAvc,
+      hasAnotherCondition,
+      investmentAmount,
+    } = get(); // Acessar os valores atuais do estado
 
-    fetch: async () => {
-        const response = await fetch("https://api-clinics.rj.r.appspot.com/all")
-        set({ data: await response.json() })
-        // set({ sortedData: [...useStore.getState().data.map(d => ({
-        //     ...d,
-        //     distance: getDistance({
-        //       position: {lat: useStore.getState().origem[0], lng: useStore.getState().origem[1]},
-        //       destination: {
-        //         lat: Number(d.lat),
-        //         lng: Number(d.long)
-        //       }
-        //     })
-        //   }))].sort((a,z) =>a.distance - z.distance)})
-    },
+    const dados = {
+      name,
+      email,
+      whatsapp,
+      state,
+      city,
+      hasAvc,
+      hasAnotherCondition,
+      investmentAmount,
+    };
+    try {
+      const urlDaAPI = "http://127.0.0.1:8000/pacientes/add";
+      const resposta = await axios.post(urlDaAPI, dados);
+      console.log("Resposta da API:", resposta.data);
+    } catch (erro) {
+      console.error("Erro ao enviar dados para a API:", erro);
+    }
+  },
 
-    fetchLatLong: async (cep) => {
-        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${cep}&key=${apiKey}`)
-            .then(response => response.json())
-            .then(data => {
-                const { lat, lng } = data.results[0].geometry;
-                set({ origem: [lat, lng] });
-                sessionStorage.setItem("lat", lat);
-                sessionStorage.setItem("lng", lng);
-            })
-            .catch(error => {
-                console.error('Erro ao obter dados de geolocalização:', error);
-            });
-    },
+  fetch: async () => {
+    const response = await fetch("https://api-clinics.rj.r.appspot.com/all");
+    set({ data: await response.json() });
+  },
 
-    armazenaOrigem: (payload1, payload2) => set({ origem: [payload1, payload2] }),
-    armazenaDestino: (payload1, payload2) => set({ destino: [payload1, payload2] })
-}))
+  fetchLatLong: async (cep) => {
+    try {
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${cep}&key=${apiKey}`
+      );
+      const data = await response.json();
+      const { lat, lng } = data.results[0].geometry;
+      set({ origem: [lat, lng] });
+      sessionStorage.setItem("lat", lat);
+      sessionStorage.setItem("lng", lng);
+    } catch (error) {
+      console.error("Erro ao obter dados de geolocalização:", error);
+    }
+  },
+
+  armazenaOrigem: (payload1, payload2) => set({ origem: [payload1, payload2] }),
+  armazenaDestino: (payload1, payload2) =>
+    set({ destino: [payload1, payload2] }),
+}));
