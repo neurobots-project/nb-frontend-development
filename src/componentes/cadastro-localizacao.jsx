@@ -17,6 +17,7 @@ export default function CadastroLocalizacao() {
   const onSubmit = () => {
     fetchLatLong(document.querySelector("#cep").value);
     postData();
+    trocarTela();
   };
 
   const checkCEP = (e) => {
@@ -26,7 +27,9 @@ export default function CadastroLocalizacao() {
         .then((response) => response.json())
         .then((data) => {
           setValue("estado", data.uf);
+          armazenaState(data.uf);
           setValue("cidade", data.localidade);
+          armazenaCity(data.localidade);
           setValue("rua", data.logradouro);
           setFocus("distancia");
         });
