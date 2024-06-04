@@ -53,7 +53,7 @@ export const useStore = create((set, get) => ({
       investmentAmount,
     };
     try {
-      const urlDaAPI = "http://127.0.0.1:8000/pacientes/add";
+      const urlDaAPI = "https://neurobots2.ue.r.appspot.com/pacientes/add";
       const resposta = await axios.post(urlDaAPI, dados);
       console.log("Resposta da API:", resposta.data);
     } catch (erro) {
